@@ -6,7 +6,7 @@ FROM node:22-alpine AS base
 RUN corepack enable
 WORKDIR /repo
 
-# --- deps: install with full workspace visible so pnpm can link @nodedr-restaurant/types ---
+# --- deps: backend workspace only; the web has its own deployment ---
 # python3/make/g++/linux-headers/eudev-dev/libusb-dev/pkgconfig are for the
 # `usb` package's native addon (direct-USB ESC/POS printing, see
 # apps/backend/src/modules/orders/escpos-usb.ts). It ships a prebuilt
@@ -20,7 +20,7 @@ FROM base AS deps
 RUN apk add --no-cache openssl python3 make g++ linux-headers eudev-dev libusb-dev pkgconfig
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 COPY apps/backend/package.json apps/backend/package.json
-COPY apps/web/package.json apps/web/package.json
+# Do not copy apps/web: its Cloudflare dependencies are not used by this image.
 COPY packages/types/package.json packages/types/package.json
 RUN pnpm install --frozen-lockfile
 
