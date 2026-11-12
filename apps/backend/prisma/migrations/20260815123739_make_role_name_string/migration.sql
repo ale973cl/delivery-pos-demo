@@ -12,4 +12,4 @@
 ALTER TABLE "roles" ALTER COLUMN "name" TYPE TEXT USING "name"::text;
 
 -- DropEnum
-DROP TYPE "StaffRoleName";
+-- Kept unused StaffRoleName type to avoid destructive cleanup on Supabase.
