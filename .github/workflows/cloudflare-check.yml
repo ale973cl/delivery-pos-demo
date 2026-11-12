@@ -1,0 +1,30 @@
+name: Cloudflare adapter check
+on:
+  push:
+    branches: [feat/cloudflare-adapter]
+  pull_request:
+    paths:
+      - 'cloudflare/**'
+      - 'apps/web/**'
+      - 'packages/types/**'
+      - 'pnpm-lock.yaml'
+      - 'wrangler.jsonc'
+      - 'package.json'
+      - '.github/workflows/cloudflare-check.yml'
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --global pnpm@11.10.0
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run test:cloudflare
+      - run: pnpm run build:cloudflare
+      - name: Bundle without publishing
+        run: pnpm --filter web exec wrangler deploy --config ../../wrangler.jsonc --dry-run
